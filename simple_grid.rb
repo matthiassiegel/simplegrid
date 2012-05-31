@@ -5,8 +5,8 @@ class SimpleGrid
   #
   # Create a new instance of GridFS, and for the requested collection
   #
-  # @param [Object] Mongo database object
-  # @param [String] GridFS collection prefix
+  # @param [Object] database Mongo database object
+  # @param [String] prefix GridFS collection prefix
   #
   def initialize(database, prefix = 'fs')
     @grid ||= Mongo::Grid.new(database, prefix)
@@ -17,8 +17,8 @@ class SimpleGrid
   #
   # Store a new file
   #
-  # @param [String, #read] String or IO-like object
-  # @param [Hash] Options Hash. See http://api.mongodb.org/ruby/current/Mongo/Grid.html#put-instance_method for options.
+  # @param [String, #read] data String or IO-like object
+  # @param [Hash] options Options Hash. See http://api.mongodb.org/ruby/current/Mongo/Grid.html#put-instance_method for options.
   # @return [BSON::ObjectId] BSON::ObjectId of the newly created file
   #
   def create(data, options = {})
@@ -29,9 +29,9 @@ class SimpleGrid
   #
   # Update an existing file, replacing the current version. If the file doesn't exist it will be created.
   #
-  # @param [BSON::ObjectId] BSON::ObjectId of the file that should be updated
-  # @param [String, #read] String or IO-like object
-  # @param [Hash] Options Hash. See http://api.mongodb.org/ruby/current/Mongo/Grid.html#put-instance_method for options.
+  # @param [BSON::ObjectId] ID BSON::ObjectId of the file that should be updated
+  # @param [String, #read] data String or IO-like object
+  # @param [Hash] options Options Hash. See http://api.mongodb.org/ruby/current/Mongo/Grid.html#put-instance_method for options.
   # @return [BSON::ObjectId, Boolean] BSON::ObjectId of the newly created file, or false 
   #
   def update(id, data, options = {})
@@ -46,7 +46,7 @@ class SimpleGrid
   #
   # Find a file by its unique ID
   #
-  # @param [BSON::ObjectId] BSON::ObjectId of the file to get
+  # @param [BSON::ObjectId] ID BSON::ObjectId of the file to get
   # @return [GridIO] GridIO instance of the requested file, or nil
   #
   def find(id)
@@ -61,7 +61,7 @@ class SimpleGrid
   #
   # Find one or more files by their filenames
   #
-  # @param [String, Regexp] Filename or regular expression
+  # @param [String, Regexp] Filename Filename or regular expression
   # @return [Array] Array of GridIO instances
   #
   def find_by_filename(filename)
@@ -80,7 +80,7 @@ class SimpleGrid
   #
   # Read a file by its unique ID
   #
-  # @param [BSON::ObjectId] BSON::ObjectId of the file to read
+  # @param [BSON::ObjectId] ID BSON::ObjectId of the file to read
   # @return [String, nil] File content, or nil
   #
   def read(id)
@@ -95,7 +95,7 @@ class SimpleGrid
   #
   # Read one or more files by their filenames
   #
-  # @param [String, Regexp] Filename or regular expression
+  # @param [String, Regexp] Filename Filename or regular expression
   # @return [Array] Array of file content strings
   #
   def read_by_filename(filename)
@@ -115,7 +115,7 @@ class SimpleGrid
   # Delete a file by its unique ID
   # Note: in safe mode, Grid.delete doesn't return Boolean, so success is confirmed by calling #find
   #
-  # @param [BSON::ObjectId] BSON::ObjectId of the file to delete
+  # @param [BSON::ObjectId] ID BSON::ObjectId of the file to delete
   # @return [Boolean] False if the file didn't exist or couldn't be deleted. True otherwise.
   #
   def delete(id)
@@ -131,7 +131,7 @@ class SimpleGrid
   #
   # Delete one or more files by their filenames
   #
-  # @param [String, Regexp] Filename or regular expression
+  # @param [String, Regexp] Filename Filename or regular expression
   # @return [Boolean] True if all went well. False if one or more files couldn't be deleted.
   #
   def delete_by_filename(filename)
