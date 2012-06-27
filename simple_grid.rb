@@ -9,8 +9,8 @@ class SimpleGrid
   # @param [String] prefix GridFS collection prefix
   #
   def initialize(database, prefix = 'fs')
-    @grid ||= Mongo::Grid.new(database, prefix)
-    @coll ||= database["#{prefix}.files"]
+    @@grid ||= Mongo::Grid.new(database, prefix)
+    @@coll ||= database["#{prefix}.files"]
   end
   
   
@@ -22,7 +22,7 @@ class SimpleGrid
   # @return [BSON::ObjectId] BSON::ObjectId of the newly created file
   #
   def create(data, options = {})
-    @grid.put(data, options)
+    @@grid.put(data, options)
   end
   
   
@@ -51,7 +51,7 @@ class SimpleGrid
   #
   def find(id)
     begin
-      @grid.get(id)
+      @@grid.get(id)
     rescue
       nil
     end
@@ -65,12 +65,10 @@ class SimpleGrid
   # @return [Array] Array of GridIO instances
   #
   def find_by_filename(filename)
-    result = @coll.find(:filename => filename).to_a
+    result = @@coll.find(:filename => filename).to_a
     
     if result.count > 1
-      new_result = []
-      result.each {|r| new_result << find(r['_id'])}
-      new_result
+      result.map! { |r| find(r['_id']) }
     else
       result.blank? ? [] : [find(result.first['_id'])]
     end
@@ -102,11 +100,9 @@ class SimpleGrid
     result = find_by_filename(filename)
     
     if result.count > 1
-      content = []
-      result.each { |r| content << r.read }
-      content
+      result.map! { |r| read(r['_id']) }
     else
-      result.blank? ? [] : [result.first.read]
+      result.blank? ? [] : [read(result['_id'])]
     end
   end
   
@@ -120,7 +116,7 @@ class SimpleGrid
   #
   def delete(id)
     begin
-      @grid.delete(id)
+      @@grid.delete(id)
       find(id) ? false : true
     rescue
       false
